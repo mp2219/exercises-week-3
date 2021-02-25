@@ -2,6 +2,7 @@ from numbers import Number
 
 
 class Polynomial:
+    """Define a polynomial and its operations"""
 
     def __init__(self, coefs):
         self.coefficients = coefs
@@ -50,3 +51,33 @@ class Polynomial:
 
     def __radd__(self, other):
         return self + other
+
+    def __sub__(self, other):
+
+        if isinstance(other, Polynomial):
+            common = min(self.degree(), other.degree()) + 1
+            negativeothercoefs = tuple(-a for a in other.coefficients)
+            coefs = tuple(a - b for a, b in zip(self.coefficients,
+                                                other.coefficients))
+            coefs += self.coefficients[common:] + negativeothercoefs[common:]
+
+            return Polynomial(coefs)
+
+        elif isinstance(other, Number):
+            return Polynomial((self.coefficients[0] - other,)
+                              + self.coefficients[1:])
+
+        else:
+            return NotImplemented
+
+    def __rsub__(self, other):
+        negativeselfcoefs = tuple(-a for a in self.coefficients)
+        return Polynomial((-self.coefficients[0] + other,)
+                          + negativeselfcoefs[1:])
+
+    def __mul__(self, other):
+        result = [0] * (len(self.coefficients) + len(other.coefficients))
+        for exponent_a, coeff_a in enumerate(self):
+            for exponent_b, coeff_b in enumerate(other):
+                result[exponent_a + exponent_b] += coeff_a * coeff_b
+        return Polynomial(result)
