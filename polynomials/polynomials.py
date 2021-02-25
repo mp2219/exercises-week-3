@@ -1,10 +1,12 @@
+"""Create a polynomial class and related basic operations."""
 from numbers import Number
 
 
 class Polynomial:
-    """Define a polynomial and its operations"""
+    """Define a polynomial and its operations."""
 
     def __init__(self, coefs):
+        """Define constructor."""
         self.coefficients = coefs
 
     def degree(self):
@@ -76,8 +78,18 @@ class Polynomial:
                           + negativeselfcoefs[1:])
 
     def __mul__(self, other):
-        result = [0] * (len(self.coefficients) + len(other.coefficients))
-        for exponent_a, coeff_a in enumerate(self):
-            for exponent_b, coeff_b in enumerate(other):
-                result[exponent_a + exponent_b] += coeff_a * coeff_b
-        return Polynomial(result)
+
+        if isinstance(other, Polynomial):
+            result = [0 for i in range(len(self.coefficients)
+                      + len(other.coefficients) - 1)]
+            for i in range(len(self.coefficients)):
+                for j in range(len(other.coefficients)):
+                    result[i+j] += self.coefficients[i] * other.coefficients[j]
+
+            return Polynomial(tuple(result))
+
+        elif isinstance(other, Number):
+            return self * Polynomial(tuple(other))
+
+    def __rmul__(self, other):
+        return self * other
